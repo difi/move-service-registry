@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static no.difi.meldingsutveksling.serviceregistry.model.OrganizationTypes.KOMM;
+
 /**
  * Contains predicates used to determine the type of service record to create/use to send messages
  */
@@ -52,5 +54,9 @@ public class ServiceRecordPredicates {
         // which is sufficient for the time being
 
         return exactly_11_numbers;
+    }
+
+    public static Predicate<EntityInfo> isMunicipality() {
+        return o -> KOMM.equals(o.getEntityType());
     }
 }

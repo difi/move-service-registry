@@ -3,13 +3,10 @@ package no.difi.meldingsutveksling.serviceregistry.businesslogic;
 import no.difi.meldingsutveksling.serviceregistry.model.OrganizationInfo;
 import no.difi.meldingsutveksling.serviceregistry.model.OrganizationType;
 import no.difi.meldingsutveksling.serviceregistry.model.OrganizationTypes;
-import no.difi.meldingsutveksling.serviceregistry.model.ServiceIdentifier;
 import org.junit.Test;
 
-import java.util.Optional;
-
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class ServiceRecordPredicatesTest {
 
@@ -65,6 +62,29 @@ public class ServiceRecordPredicatesTest {
         final boolean result = ServiceRecordPredicates.usesFormidlingstjenesten().test(orgl);
 
         assertThat("Public organization should use formidlingstjenesten", result, equalTo(true));
+    }
+
+    @Test
+    public void organizationTypeKommShouldBeMunicipality() {
+        OrganizationInfo komm = new OrganizationInfo("1234", "Biristrand", OrganizationType.from("KOMM"));
+
+        final boolean result = ServiceRecordPredicates.isMunicipality().test(komm);
+
+        assertThat("Organization with akronym KOMM is a municipality", result, equalTo(true));
+    }
+
+    @Test
+    public void organizationTypeASShouldNotBeMunicipality() {
+        OrganizationInfo as = privateOrganization();
+
+        final boolean municipality = ServiceRecordPredicates.isMunicipality().test(as);
+
+        assertThat("Organiation with akronym AS should not be a municipality", municipality, equalTo(false));
+    }
+
+    private OrganizationInfo municipality() {
+        OrganizationType municipality = new OrganizationTypes().municipality().stream().findFirst().orElseThrow(() -> new RuntimeException("Could not find a municipality type"));
+        return null;
     }
 
     private OrganizationInfo privateOrganization() {
