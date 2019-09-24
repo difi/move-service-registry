@@ -3,15 +3,15 @@ package no.difi.meldingsutveksling.serviceregistry.service;
 import no.difi.meldingsutveksling.serviceregistry.model.DocumentType;
 import no.difi.meldingsutveksling.serviceregistry.model.Process;
 import no.difi.meldingsutveksling.serviceregistry.persistence.ProcessRepository;
+import org.assertj.core.util.Sets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -74,7 +74,7 @@ public class ProcessServiceTest {
     public void update_ChangeDocumentTypes_ShouldBeSaved() {
         Process existingProcessMock = mock(Process.class);
         when(repositoryMock.findByIdentifier(any())).thenReturn(existingProcessMock);
-        List<DocumentType> newTypes = new ArrayList<>();
+        Set<DocumentType> newTypes = Sets.newHashSet();
         DocumentType documentTypeMock = mock(DocumentType.class);
         newTypes.add(documentTypeMock);
         when(documentTypeServiceMock.findByIdentifier(any())).thenReturn(Optional.of(documentTypeMock));
@@ -92,7 +92,7 @@ public class ProcessServiceTest {
     public void update_ProcessContainsNonExistingDocumentType_ShouldAddDocumentTypeAndSucceed() {
         Process existingProcessMock = mock(Process.class);
         when(repositoryMock.findByIdentifier(anyString())).thenReturn(existingProcessMock);
-        List<DocumentType> newTypes = new ArrayList<>();
+        Set<DocumentType> newTypes = Sets.newHashSet();
         DocumentType documentTypeMock = mock(DocumentType.class);
         newTypes.add(documentTypeMock);
         Process updatedProcess = createProcess(null, null, newTypes);
@@ -104,7 +104,7 @@ public class ProcessServiceTest {
         verify(documentTypeServiceMock).add(documentTypeMock);
     }
 
-    private static Process createProcess(String serviceCode, String serviceEditionCode, List<DocumentType> documentTypes) {
+    private static Process createProcess(String serviceCode, String serviceEditionCode, Set<DocumentType> documentTypes) {
         Process updatedProcess = new Process();
         updatedProcess.setServiceCode(serviceCode);
         updatedProcess.setServiceEditionCode(serviceEditionCode);

@@ -141,9 +141,9 @@ public class ServiceRecordFactoryTest {
                 .setCategory(ProcessCategory.ARKIVMELDING)
                 .setServiceCode("4192")
                 .setServiceEditionCode("270815");
-        processSkatt.setDocumentTypes(Lists.newArrayList(documentType));
-        processAdmin.setDocumentTypes(Lists.newArrayList(documentType));
-        documentType.setProcesses(Lists.newArrayList(processAdmin, processSkatt));
+        processSkatt.setDocumentTypes(Sets.newHashSet(documentType));
+        processAdmin.setDocumentTypes(Sets.newHashSet(documentType));
+        documentType.setProcesses(Sets.newHashSet(processAdmin, processSkatt));
         when(processService.findAll(ProcessCategory.ARKIVMELDING)).thenReturn(Sets.newHashSet(processAdmin, processSkatt));
         when(processService.getDefaultArkivmeldingProcess()).thenReturn(processAdmin);
         when(lookupService.lookupRegisteredProcesses(eq(String.format("%s:%s", ELMA_LOOKUP_ICD, ORGNR_FIKS)), anySet())).thenReturn(Sets.newHashSet());
@@ -151,7 +151,7 @@ public class ServiceRecordFactoryTest {
         Process vedtakProcess = new Process()
                 .setIdentifier(DIGITALPOST_PROCESS_VEDTAK)
                 .setCategory(ProcessCategory.DIGITALPOST)
-                .setDocumentTypes(Lists.newArrayList(new DocumentType().setIdentifier(DIGITALPOST_DOCTYPE_PRINT)));
+                .setDocumentTypes(Sets.newHashSet(new DocumentType().setIdentifier(DIGITALPOST_DOCTYPE_PRINT)));
         when(processService.findAll(ProcessCategory.DIGITALPOST)).thenReturn(Sets.newHashSet(vedtakProcess));
 
         DocumentType einnsynJournalpostDocumentType = new DocumentType()
@@ -162,8 +162,8 @@ public class ServiceRecordFactoryTest {
                 .setServiceCode("567")
                 .setServiceEditionCode("5678");
         Optional<Process> journalpostProcess = Optional.of(einnsynJournalpostProcess);
-        einnsynJournalpostProcess.setDocumentTypes(Lists.newArrayList(einnsynJournalpostDocumentType));
-        einnsynJournalpostDocumentType.setProcesses(Lists.newArrayList(einnsynJournalpostProcess));
+        einnsynJournalpostProcess.setDocumentTypes(Sets.newHashSet(einnsynJournalpostDocumentType));
+        einnsynJournalpostDocumentType.setProcesses(Sets.newHashSet(einnsynJournalpostProcess));
         when(processService.findAll(ProcessCategory.EINNSYN)).thenReturn(Sets.newHashSet(einnsynJournalpostProcess));
         when(lookupService.lookupRegisteredProcesses(eq(String.format("%s:%s", ELMA_LOOKUP_ICD, ORGNR_EINNSYN_JOURNALPOST)), anySet())).thenReturn(Sets.newHashSet());
         when(processService.findByIdentifier(EINNSYN_PROCESS_JOURNALPOST)).thenReturn(journalpostProcess);
@@ -366,8 +366,8 @@ public class ServiceRecordFactoryTest {
                 .setServiceCode("567")
                 .setServiceEditionCode("5678");
         Optional<Process> responseProcess = Optional.of(einnsynResponseProcess);
-        einnsynResponseDocumentType.setProcesses(Lists.newArrayList(einnsynResponseProcess));
-        einnsynResponseProcess.setDocumentTypes(Lists.newArrayList(einnsynResponseDocumentType));
+        einnsynResponseDocumentType.setProcesses(Sets.newHashSet(einnsynResponseProcess));
+        einnsynResponseProcess.setDocumentTypes(Sets.newHashSet(einnsynResponseDocumentType));
         when(processService.findByIdentifier(EINNSYN_PROCESS_RESPONSE)).thenReturn(responseProcess);
         when(lookupService.lookupRegisteredProcesses(eq(String.format("%s:%s", ELMA_LOOKUP_ICD, ORGNR_EINNSYN_RESPONSE)), anySet()))
                 .thenReturn(Sets.newHashSet(ProcessIdentifier.of(EINNSYN_PROCESS_RESPONSE)));

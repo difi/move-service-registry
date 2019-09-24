@@ -11,6 +11,7 @@ import no.difi.meldingsutveksling.serviceregistry.service.krr.KrrService;
 import no.difi.meldingsutveksling.serviceregistry.service.virksert.VirkSertService;
 import no.difi.vefa.peppol.common.model.TransportProfile;
 import no.difi.vefa.peppol.lookup.LookupClient;
+import org.assertj.core.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -63,7 +64,7 @@ public class ProcessAdministrationIT {
     @Test
     public void addProcess_NewDocumentType_ProcessAndDocumentTypeShouldBeAdded() {
         Process process = createProcess("process", "service", "edition", ProcessCategory.ARKIVMELDING);
-        ArrayList<DocumentType> documentTypes = new ArrayList<>();
+        Set<DocumentType> documentTypes = Sets.newHashSet();
         DocumentType documentType = createDocumentType("DocumentType");
         documentTypes.add(documentType);
         process.setDocumentTypes(documentTypes);
@@ -77,7 +78,7 @@ public class ProcessAdministrationIT {
     @Test
     public void addProcess_DocumentTypeAlreadyExists_ProcessShouldBeAdded() {
         Process process = createProcess("process", "service", "edition", ProcessCategory.ARKIVMELDING);
-        ArrayList<DocumentType> documentTypes = new ArrayList<>();
+        Set<DocumentType> documentTypes = Sets.newHashSet();
         DocumentType documentType = createDocumentType("DocumentType");
         documentTypes.add(documentType);
         process.setDocumentTypes(documentTypes);
@@ -94,7 +95,7 @@ public class ProcessAdministrationIT {
     public void updateProcess_NewDocumentType_ProcessAndDocumentTypeShouldBeAdded() {
         String processIdentifier = "process";
         Process process = createProcess(processIdentifier, "service", "edition", ProcessCategory.ARKIVMELDING);
-        ArrayList<DocumentType> documentTypes = new ArrayList<>();
+        Set<DocumentType> documentTypes = Sets.newHashSet();
         DocumentType documentType1 = createDocumentType("DocumentType1");
         documentTypes.add(documentType1);
         process.setDocumentTypes(documentTypes);
@@ -113,7 +114,7 @@ public class ProcessAdministrationIT {
     public void updateProcess_DocumentTypeAlreadyExists_ProcessAndDocumentTypeShouldBeAdded() {
         String processIdentifier = "process";
         Process process = createProcess(processIdentifier, "service", "edition", ProcessCategory.ARKIVMELDING);
-        ArrayList<DocumentType> documentTypes = new ArrayList<>();
+        Set<DocumentType> documentTypes = Sets.newHashSet();
         DocumentType documentType1 = createDocumentType("DocumentType1");
         documentTypes.add(documentType1);
         DocumentType documentType2 = createDocumentType("DocumentType2");
@@ -133,7 +134,7 @@ public class ProcessAdministrationIT {
     @Test
     public void deleteProcess_ProcessHasDocumentType_DocumentTypeShouldRemain() {
         Process process = createProcess("process", "service", "edition", ProcessCategory.ARKIVMELDING);
-        ArrayList<DocumentType> documentTypes = new ArrayList<>();
+        Set<DocumentType> documentTypes = Sets.newHashSet();
         DocumentType documentType = createDocumentType("DocumentType");
         documentTypes.add(documentType);
         process.setDocumentTypes(documentTypes);

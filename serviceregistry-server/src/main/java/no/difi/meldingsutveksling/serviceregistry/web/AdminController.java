@@ -1,6 +1,6 @@
 package no.difi.meldingsutveksling.serviceregistry.web;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Api(value = "Administration", tags = {"Administration"})
 @RestController
@@ -52,7 +53,7 @@ public class AdminController {
             if (existingProcess.isPresent()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            List<DocumentType> persistedDoctypes = Lists.newArrayList();
+            Set<DocumentType> persistedDoctypes = Sets.newHashSet();
             for (DocumentType type : process.getDocumentTypes()) {
                 Optional<DocumentType> docFind = documentTypeService.findByIdentifier(type.getIdentifier());
                 if (!docFind.isPresent()) {

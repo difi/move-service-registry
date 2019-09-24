@@ -9,7 +9,7 @@ import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "identifier"))
@@ -28,7 +28,7 @@ public class DocumentType {
 
     @ManyToMany(mappedBy = "documentTypes", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("documentTypes")
-    private List<Process> processes;
+    private Set<Process> processes;
 
 }
 

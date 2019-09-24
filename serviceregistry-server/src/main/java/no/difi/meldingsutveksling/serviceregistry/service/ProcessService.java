@@ -1,6 +1,6 @@
 package no.difi.meldingsutveksling.serviceregistry.service;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import no.difi.meldingsutveksling.serviceregistry.EntityNotFoundException;
 import no.difi.meldingsutveksling.serviceregistry.config.ServiceregistryProperties;
 import no.difi.meldingsutveksling.serviceregistry.model.DocumentType;
@@ -34,7 +34,7 @@ public class ProcessService {
 
     @Transactional
     public Process add(Process process) {
-        List<DocumentType> persistedTypes = persistDocumentTypes(process.getDocumentTypes());
+        Set<DocumentType> persistedTypes = persistDocumentTypes(process.getDocumentTypes());
         process.setDocumentTypes(persistedTypes);
         return repository.save(process);
     }
@@ -47,9 +47,9 @@ public class ProcessService {
                 return false;
             }
             Process process = optionalProcess.get();
-            List<DocumentType> documentTypes = updatedProcess.getDocumentTypes();
+            Set<DocumentType> documentTypes = updatedProcess.getDocumentTypes();
             if (documentTypes != null) {
-                List<DocumentType> persistedTypes = persistDocumentTypes(documentTypes);
+                Set<DocumentType> persistedTypes = persistDocumentTypes(documentTypes);
                 process.setDocumentTypes(persistedTypes);
             }
             if (updatedProcess.getServiceCode() != null) {
@@ -65,8 +65,8 @@ public class ProcessService {
         }
     }
 
-    private List<DocumentType> persistDocumentTypes(List<DocumentType> documentTypes) {
-        List<DocumentType> persistedTypes = Lists.newArrayList();
+    private Set<DocumentType> persistDocumentTypes(Set<DocumentType> documentTypes) {
+        Set<DocumentType> persistedTypes = Sets.newHashSet();
         for (DocumentType documentType : documentTypes) {
             Optional<DocumentType> type = documentTypeService.findByIdentifier(documentType.getIdentifier());
             if (!type.isPresent()) {

@@ -25,9 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -68,7 +66,7 @@ public class AdminControllerTest {
     @Test
     public void addProcess_OccupiedIdentifier_ResponseShouldBeConflict() throws Exception {
         when(processServiceMock.findByIdentifier(anyString())).thenReturn(Optional.of(mock(Process.class)));
-        Process process = createProcess("ProcessIdentifier", ProcessCategory.ARKIVMELDING, "code", "editionCode", new ArrayList<>());
+        Process process = createProcess("ProcessIdentifier", ProcessCategory.ARKIVMELDING, "code", "editionCode", new HashSet<>());
 
         MockHttpServletResponse response = doPost(PROCESSES_ENDPOINT_URI, process);
 
@@ -79,7 +77,7 @@ public class AdminControllerTest {
     public void addProcess_Success_ResponseShouldBeCreated() throws Exception {
         when(processServiceMock.findByIdentifier(anyString())).thenReturn(Optional.empty());
         when(documentTypeServiceMock.findByIdentifier(anyString())).thenReturn(Optional.empty());
-        ArrayList<DocumentType> documentTypes = new ArrayList<>();
+        Set<DocumentType> documentTypes = new HashSet<>();
         documentTypes.add(createDocumentType("DocumentTypeIdentifier"));
         Process process = createProcess("ProcessIdentifier", ProcessCategory.ARKIVMELDING, "code", "editionCode", documentTypes);
 
@@ -103,7 +101,7 @@ public class AdminControllerTest {
 
     @Test
     public void getProcess_ProcessFound_ResponseShouldBeOk() throws Exception {
-        Process process = createProcess("ProcessIdentifier", ProcessCategory.ARKIVMELDING, "code", "editionCode", new ArrayList<>());
+        Process process = createProcess("ProcessIdentifier", ProcessCategory.ARKIVMELDING, "code", "editionCode", new HashSet<>());
         when(processServiceMock.findByIdentifier(anyString())).thenReturn(Optional.of(process));
         URI processUri = UriComponentsBuilder.fromUri(PROCESSES_ENDPOINT_URI)
                 .pathSegment("ProcessIdentifier").build().toUri();
@@ -263,7 +261,7 @@ public class AdminControllerTest {
         return documentType;
     }
 
-    private Process createProcess(String identifier, ProcessCategory category, String serviceCode, String serviceEditionCode, List<DocumentType> documentTypes) {
+    private Process createProcess(String identifier, ProcessCategory category, String serviceCode, String serviceEditionCode, Set<DocumentType> documentTypes) {
         Process process = new Process();
         process.setIdentifier(identifier);
         process.setServiceCode(serviceCode);

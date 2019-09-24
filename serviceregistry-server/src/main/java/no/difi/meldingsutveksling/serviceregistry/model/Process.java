@@ -7,7 +7,7 @@ import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "identifier"))
@@ -34,6 +34,6 @@ public class Process {
             inverseJoinColumns = @JoinColumn(name = "doctype_id", referencedColumnName = "id")
     )
     @JsonIgnoreProperties("processes")
-    private List<DocumentType> documentTypes;
+    private Set<DocumentType> documentTypes;
 
 }
