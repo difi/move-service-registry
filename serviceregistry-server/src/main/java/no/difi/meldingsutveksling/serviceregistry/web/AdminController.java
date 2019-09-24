@@ -1,10 +1,10 @@
 package no.difi.meldingsutveksling.serviceregistry.web;
 
-import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import no.difi.meldingsutveksling.serviceregistry.EntityNotFoundException;
 import no.difi.meldingsutveksling.serviceregistry.model.DocumentType;
 import no.difi.meldingsutveksling.serviceregistry.model.Process;
 import no.difi.meldingsutveksling.serviceregistry.service.DocumentTypeService;
@@ -53,17 +53,8 @@ public class AdminController {
             if (existingProcess.isPresent()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Set<DocumentType> persistedDoctypes = Sets.newHashSet();
-            for (DocumentType type : process.getDocumentTypes()) {
-                Optional<DocumentType> docFind = documentTypeService.findByIdentifier(type.getIdentifier());
-                if (!docFind.isPresent()) {
-                    persistedDoctypes.add(documentTypeService.add(type));
-                } else {
-                    persistedDoctypes.add(docFind.get());
-                }
-            }
-            process.setDocumentTypes(persistedDoctypes);
-            processService.add(process);
+            Set<DocumentType> persistedDoctypes = documentTypeService.add(process.getDocumentTypes());
+            processService.save(process, persistedDoctypes);
             UriComponents uriComponents = UriComponentsBuilder.fromUriString("/processes")
                     .path(process.getIdentifier())
                     .build();
@@ -104,11 +95,10 @@ public class AdminController {
     public ResponseEntity updateProcess(@ApiParam("Process identifier") @PathVariable String processIdentifier,
                                         @ApiParam("Process data") @RequestBody Process processWithValuesForUpdate) {
         try {
-            if (processService.update(processIdentifier, processWithValuesForUpdate)) {
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            processService.update(processIdentifier, processWithValuesForUpdate);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -148,6 +138,20 @@ public class AdminController {
                 documentTypeService.delete(documentType.get());
                 return ResponseEntity.noContent().build();
             }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @ApiOperation(value = "Update a Document Type", tags = {"Document Type", "Administration"})
+    @PutMapping(value = "/documentTypes/{identifier:.+}")
+    public ResponseEntity updateDocumentType(@ApiParam("Document type identifier") @PathVariable String identifier,
+                                             @ApiParam("Updated document type") @RequestBody DocumentType documentType) {
+        try {
+            documentTypeService.update(identifier, documentType);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -1,6 +1,6 @@
 package no.difi.meldingsutveksling.serviceregistry;
 
-public class EntityNotFoundException extends RuntimeException {
+public class EntityNotFoundException extends Exception {
     public EntityNotFoundException(Throwable cause) {
         super(cause);
     }

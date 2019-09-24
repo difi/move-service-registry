@@ -33,49 +33,40 @@ public class ProcessService {
     }
 
     @Transactional
-    public Process add(Process process) {
-        Set<DocumentType> persistedTypes = persistDocumentTypes(process.getDocumentTypes());
-        process.setDocumentTypes(persistedTypes);
+    public Process save(Process process, Set<DocumentType> documentTypes) {
+        process.setDocumentTypes(documentTypes);
+        return save(process);
+    }
+
+    @Transactional
+    Process save(Process process) {
         return repository.save(process);
     }
 
     @Transactional
-    public Boolean update(String processIdentifier, Process updatedProcess) {
-        try {
-            Optional<Process> optionalProcess = findByIdentifier(processIdentifier);
-            if (!optionalProcess.isPresent()) {
-                return false;
-            }
-            Process process = optionalProcess.get();
-            Set<DocumentType> documentTypes = updatedProcess.getDocumentTypes();
-            if (documentTypes != null) {
-                Set<DocumentType> persistedTypes = persistDocumentTypes(documentTypes);
-                process.setDocumentTypes(persistedTypes);
-            }
-            if (updatedProcess.getServiceCode() != null) {
-                process.setServiceCode(updatedProcess.getServiceCode());
-            }
-            if (updatedProcess.getServiceEditionCode() != null) {
-                process.setServiceEditionCode(updatedProcess.getServiceEditionCode());
-            }
-            Process updated = repository.save(process);
-            return updated != null;
-        } catch (Exception e) {
-            throw new EntityNotFoundException(updatedProcess.getIdentifier());
+    public Process update(String processIdentifier, Process updatedProcess) throws EntityNotFoundException {
+        Optional<Process> optionalProcess = findByIdentifier(processIdentifier);
+        if (!optionalProcess.isPresent()) {
+            throw new EntityNotFoundException(processIdentifier);
         }
-    }
-
-    private Set<DocumentType> persistDocumentTypes(Set<DocumentType> documentTypes) {
-        Set<DocumentType> persistedTypes = Sets.newHashSet();
-        for (DocumentType documentType : documentTypes) {
-            Optional<DocumentType> type = documentTypeService.findByIdentifier(documentType.getIdentifier());
-            if (!type.isPresent()) {
-                persistedTypes.add(documentTypeService.add(documentType));
-            } else {
-                persistedTypes.add(type.get());
-            }
+        Process process = optionalProcess.get();
+        Set<DocumentType> documentTypes = updatedProcess.getDocumentTypes();
+        Set<DocumentType> updatedDocumentTypes = Sets.newHashSet();
+        if (documentTypes != null) {
+            updatedDocumentTypes = documentTypeService.add(documentTypes);
         }
-        return persistedTypes;
+        if (updatedProcess.getServiceCode() != null) {
+            process.setServiceCode(updatedProcess.getServiceCode());
+        }
+        if (updatedProcess.getServiceEditionCode() != null) {
+            process.setServiceEditionCode(updatedProcess.getServiceEditionCode());
+        }
+        if (updatedProcess.getCategory() != null) {
+            process.setCategory(updatedProcess.getCategory());
+        }
+        return updatedDocumentTypes.isEmpty()
+                ? save(process)
+                : save(process, updatedDocumentTypes);
     }
 
     @Transactional

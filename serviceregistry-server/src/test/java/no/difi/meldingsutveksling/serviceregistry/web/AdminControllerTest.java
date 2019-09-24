@@ -76,7 +76,6 @@ public class AdminControllerTest {
     @Test
     public void addProcess_Success_ResponseShouldBeCreated() throws Exception {
         when(processServiceMock.findByIdentifier(anyString())).thenReturn(Optional.empty());
-        when(documentTypeServiceMock.findByIdentifier(anyString())).thenReturn(Optional.empty());
         Set<DocumentType> documentTypes = new HashSet<>();
         documentTypes.add(createDocumentType("DocumentTypeIdentifier"));
         Process process = createProcess("ProcessIdentifier", ProcessCategory.ARKIVMELDING, "code", "editionCode", documentTypes);
@@ -84,8 +83,8 @@ public class AdminControllerTest {
         MockHttpServletResponse response = doPost(PROCESSES_ENDPOINT_URI, process);
 
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-        verify(processServiceMock).add(any(Process.class));
-        verify(documentTypeServiceMock).add(any(DocumentType.class));
+        verify(processServiceMock).save(any(Process.class), anySet());
+        verify(documentTypeServiceMock).add(anySet());
     }
 
     @Test
@@ -156,7 +155,7 @@ public class AdminControllerTest {
     public void updateProcess_Success_ResponseShouldBeOk() throws Exception {
         URI processUri = UriComponentsBuilder.fromUri(PROCESSES_ENDPOINT_URI).pathSegment("processID").build().toUri();
         Process updatedValues = createProcess("n/a", null, "serviceCode2", null, null);
-        when(processServiceMock.update(anyString(), any(Process.class))).thenReturn(true);
+        when(processServiceMock.update(anyString(), any(Process.class))).thenReturn(updatedValues);
 
         MockHttpServletResponse response = doPut(processUri, updatedValues);
 
@@ -164,14 +163,14 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void updateProcess_Failure_ResponseShouldBeNotFound() throws Exception {
+    public void updateProcess_Failure_ResponseShouldBeBadRequest() throws Exception {
         URI processUri = UriComponentsBuilder.fromUri(PROCESSES_ENDPOINT_URI).pathSegment("processID").build().toUri();
         Process updatedValues = createProcess("n/a", null, "serviceCode2", null, null);
-        when(processServiceMock.update(anyString(), any(Process.class))).thenReturn(false);
+        when(processServiceMock.update(anyString(), any(Process.class))).thenThrow(new RuntimeException("test exception"));
 
         MockHttpServletResponse response = doPut(processUri, updatedValues);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
     }
 
     @Test

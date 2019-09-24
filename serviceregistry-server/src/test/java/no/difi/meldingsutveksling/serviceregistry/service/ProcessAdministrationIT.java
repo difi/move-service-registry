@@ -1,5 +1,6 @@
 package no.difi.meldingsutveksling.serviceregistry.service;
 
+import no.difi.meldingsutveksling.serviceregistry.EntityNotFoundException;
 import no.difi.meldingsutveksling.serviceregistry.MoveServiceRegistryApplication;
 import no.difi.meldingsutveksling.serviceregistry.client.brreg.BrregClient;
 import no.difi.meldingsutveksling.serviceregistry.model.DocumentType;
@@ -67,9 +68,8 @@ public class ProcessAdministrationIT {
         Set<DocumentType> documentTypes = Sets.newHashSet();
         DocumentType documentType = createDocumentType("DocumentType");
         documentTypes.add(documentType);
-        process.setDocumentTypes(documentTypes);
 
-        processService.add(process);
+        processService.save(process, documentTypes);
 
         assertEquals(1, processRepository.count());
         assertEquals(1, documentTypeRepository.count());
@@ -85,14 +85,14 @@ public class ProcessAdministrationIT {
         documentTypeRepository.save(documentType);
 
         assertEquals(1, documentTypeRepository.count());
-        processService.add(process);
+        processService.save(process, documentTypes);
 
         assertEquals(1, processRepository.count());
         assertEquals(1, documentTypeRepository.count());
     }
 
     @Test
-    public void updateProcess_NewDocumentType_ProcessAndDocumentTypeShouldBeAdded() {
+    public void updateProcess_NewDocumentType_ProcessAndDocumentTypeShouldBeAdded() throws EntityNotFoundException {
         String processIdentifier = "process";
         Process process = createProcess(processIdentifier, "service", "edition", ProcessCategory.ARKIVMELDING);
         Set<DocumentType> documentTypes = Sets.newHashSet();
@@ -111,7 +111,7 @@ public class ProcessAdministrationIT {
     }
 
     @Test
-    public void updateProcess_DocumentTypeAlreadyExists_ProcessAndDocumentTypeShouldBeAdded() {
+    public void updateProcess_DocumentTypeAlreadyExists_ProcessAndDocumentTypeShouldBeAdded() throws EntityNotFoundException {
         String processIdentifier = "process";
         Process process = createProcess(processIdentifier, "service", "edition", ProcessCategory.ARKIVMELDING);
         Set<DocumentType> documentTypes = Sets.newHashSet();

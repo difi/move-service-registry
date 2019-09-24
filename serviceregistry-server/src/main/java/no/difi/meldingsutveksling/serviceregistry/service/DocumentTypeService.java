@@ -1,5 +1,6 @@
 package no.difi.meldingsutveksling.serviceregistry.service;
 
+import com.google.common.collect.Sets;
 import no.difi.meldingsutveksling.serviceregistry.EntityNotFoundException;
 import no.difi.meldingsutveksling.serviceregistry.model.BusinessMessageTypes;
 import no.difi.meldingsutveksling.serviceregistry.model.DocumentType;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DocumentTypeService {
@@ -36,8 +38,22 @@ public class DocumentTypeService {
     }
 
     @Transactional
-    public DocumentType update(DocumentType updatedDocumentType) {
-        DocumentType existing = repository.findByIdentifier(updatedDocumentType.getIdentifier());
+    public Set<DocumentType> add(Set<DocumentType> documentTypes) {
+        Set<DocumentType> persistedDoctypes = Sets.newHashSet();
+        for (DocumentType type : documentTypes) {
+            Optional<DocumentType> existing = findByIdentifier(type.getIdentifier());
+            if (!existing.isPresent()) {
+                persistedDoctypes.add(add(type));
+            } else {
+                persistedDoctypes.add(existing.get());
+            }
+        }
+        return persistedDoctypes;
+    }
+
+    @Transactional
+    public DocumentType update(String identifier, DocumentType updatedDocumentType) throws EntityNotFoundException {
+        DocumentType existing = repository.findByIdentifier(identifier);
         if (null == existing) {
             throw new EntityNotFoundException(updatedDocumentType.getIdentifier());
         }
